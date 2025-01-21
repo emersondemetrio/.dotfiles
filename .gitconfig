@@ -1,0 +1,8 @@
+# This is Git's per-user configuration file.
+[user]
+	name = emersondemetrio
+	email = emer.demetrio@gmail.com
+
+[alias]
+	commit-e = -c user.name='emersondemetrio' -c user.email='emer.demetrio@com' commit
+	logg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
