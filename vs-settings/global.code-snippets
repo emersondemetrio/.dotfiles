@@ -1,0 +1,85 @@
+{
+	"Print content console": {
+		"prefix": [
+			"logs",
+			"_logs"
+		],
+		"body": [
+			"\n",
+			"console.log('$1', $1);",
+			"$2"
+		],
+		"description": "Log output to console"
+	},
+	"Print message console": {
+		"prefix": "log",
+		"body": [
+			"console.log('$1');",
+			"\n"
+		],
+		"description": "Log output to console"
+	},
+	"create react component": {
+		"prefix": "crc",
+		"body": [
+			"import React from 'react';\n",
+			"const $1 = () => {",
+			"\treturn (\n\t\t<div>$1$2</div>\n\t);",
+			"};\n",
+			"export default $1;"
+		],
+		"description": "create react component"
+	},
+	"usefx": {
+		"prefix": "usefx",
+		"body": [
+			"\nuseEffect(() => {",
+			"\t$1",
+			"}, [$1]);\n"
+		],
+		"description": "create useEffect hook"
+	},
+	"usest": {
+		"prefix": "usest",
+		"body": [
+			"\n const [$1, set$1] = useState($2);\n"
+		],
+		"description": "create useState hook"
+	},
+	"export default component": {
+		"prefix": "edp",
+		"body": [
+			"\nexport { default } from './$1';\n"
+		]
+	},
+	"new props": {
+		"prefix": "props",
+		"body": [
+			"\ntype $1Props = {\n\t$1: string",
+			"}"
+		]
+	},
+	"create-mobile-component": {
+		"prefix": "cmc",
+		"description": "Create new Mobile Component",
+		"body": [
+			"import React, { useEffect, useState } from 'react';",
+			"import { Box, Typography } from '@drivekyte/mobile-components';\n",
+			"type $1Props = {\n",
+			"}\n",
+			"const $1 = ({ }: $1Props) => {",
+			"const [$2, set$2] = useState($3);",
+			"return (",
+			"\t<Box>",
+			"\t\t<Typography color='primary' variant='headline-2'>",
+			"\t\t\t$1",
+			"\t\t</Typography>",
+			"\t</Box>",
+			"\t);",
+			"};\n",
+			"export default $1;\n\n",
+			"\n// EXPORT DEFAULT PLACE THIS IN ANOTHER FILE\n\n",
+			"export { default } from './$1';"
+		]
+	}
+}

@@ -12,5 +12,29 @@ src/random-pass.py
 src/start-all.sh
 src/open-issue.sh
 
+src/go/**/*
 !src/go/**/*.go
 !src/go/**/*.sh
+
+*.env
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+
+# ignore all env files in all folders
+**/*.env
+**/*.env.local
+**/*.env.development.local
+**/*.env.test.local
+**/*.env.production.local
+
+# standard python gitignore for venv etc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+
+# all .ds_store files
+.DS_Store

@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/opt/homebrew/bin/node
 
 const cleanUpString = (s) => {
   return s

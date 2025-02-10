@@ -94,3 +94,43 @@ alias copybranchname="copy-branch-name"
 alias copybn="copy-branch-name"
 
 alias gcnv="git add .; git commit --no-verify"
+
+url_from_branch() {
+    # works with github only.
+    # Get the remote origin URL
+    local url=$(git config --get remote.origin.url)
+
+    # exit if there's no git folder
+    if [ ! -d .git ]; then
+        echo "https://github.com/orgs/agencyenterprise/repositories"
+    fi
+
+    # Remove any extra forward slashes and colons from the URL
+    url=$(echo "$url" | sed -E 's#^(https?:/?/?)/#https://#')
+
+    # Check if the URL is in SSH format
+    if [[ $url == git@* ]]; then
+        # Convert SSH format to HTTPS format
+        url=$(echo "$url" | sed -E 's#^git@([^:]+):#https://\1/#')
+    fi
+
+    # Remove the .git suffix if present
+    url=${url%.git}
+
+    # Clean up any remaining double slashes (except after https:)
+    url=$(echo "$url" | sed -E 's#([^:])//+#\1/#g')
+
+    # If the URL is already in HTTPS format, ensure it's correctly formatted
+    if [[ $url == https://* ]]; then
+        echo "$url"
+    else
+        # Prefix with https:// if not already present
+        echo "https://$url"
+    fi
+}
+
+# Alias to open the remote repository in Google Chrome
+alias open-remote='open -a "Google Chrome" "$(url_from_branch)"'
+alias open-issues='open -a "Google Chrome" "$(url_from_branch)/issues"'
+alias open-mrs='open -a "Google Chrome" "$(url_from_branch)/pulls"'
+alias merges='open -a "Google Chrome" "$(url_from_branch)/pulls"'

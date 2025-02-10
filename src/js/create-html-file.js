@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/opt/homebrew/bin/node
 const fs = require('fs');
 const [link, path] = process.argv.slice(2);
 

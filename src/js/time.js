@@ -58,7 +58,7 @@ const generateResponse = () =>
 			current: isCurrent(timeZone) ? '✅' : '',
 			location,
 			date: formatDate(currentDate),
-			diff,
+			diff
 		};
 	});
 

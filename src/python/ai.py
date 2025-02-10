@@ -1,144 +1,277 @@
-#!/opt/homebrew/bin/python3
+#!/usr/bin/env python3
+"""
+A CLI tool for interacting with language models (OpenAI and Ollama).
+Supports various tasks like translation, grammar checking, and code syntax examples.
+Features an interactive chat mode with history.
+"""
 
 import os
+import sys
+import socket
+from dataclasses import dataclass, field
+from typing import Optional, Literal, Dict, List
+from pathlib import Path
+import argparse
+
 from openai import OpenAI
 from dotenv import load_dotenv
 import ollama
-import argparse
 
-"""
-# Instructions (how to install and use)
-pip3 install python-dotenv --break-system-packages
-pip3 install openai --break-system-packages
-pip3 install ollama --break-system-packages # requires models. Run ollama run llama3.2
-"""
+# Type definitions
+TaskType = Literal["translate", "grammar", "syntax", "adsyntax", "explain", "summarize", "chat", "tone"]
+Message = Dict[str, str]
 
-load_dotenv()
+@dataclass
+class Config:
+    """Configuration for the language model interaction."""
+    prompt: str
+    context: Optional[str] = None
+    file: Optional[Path] = None
+    library: str = "openai"
+    output_file: Optional[Path] = None
+    task: TaskType = "chat"
+    output_lang: str = "en"
+    debug: bool = False
+    keep_alive: bool = False
+    max_history: int = 20
+    tone: str = "casual"
+    conversation_history: List[Message] = field(default_factory=list)
 
-if not os.getenv("OPENAI_API_KEY"):
-    raise ValueError("OPENAI_API_KEY is not set")
+class PromptTemplates:
+    """Collection of prompt templates for different tasks."""
 
-def get_translation_prompt(lang="english"):
-    return f"Only give me the translation to {lang} of the following text: "
+    @staticmethod
+    def translate(lang: str) -> str:
+        return f"Only give me the translation to {lang} of the following text: "
 
+    @staticmethod
+    def tone(tone_style: str) -> str:
+        return f"Rewrite the following text in a {tone_style} tone while preserving its meaning and applying grammar fixes: "
 
-GRAMMAR_PROMPT=f"Only reply with the applied english grammar checks and corrections to the following text: "
-SYNTAX_PROMPT="Only reply with the most simple example syntax of the following prompt: "
-AD_SYNTAX_PROMPT="Only reply with the example syntax of the following prompt: "
+    GRAMMAR = "Unless there's nothing to fix, only reply with the applied english grammar checks and corrections to the following text: "
+    SYNTAX = "Only reply with the most simple example syntax of the following prompt: "
+    AD_SYNTAX = "Only reply with the example syntax of the following prompt: "
+    EXPLAIN = "Only reply with the explanation of the following subject: "
+    SUMMARIZE = "Only reply with the summary of the file: "
 
-OpenAIClient = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+class LLMClient:
+    """Base class for language model interactions."""
 
+    def generate_response(self, prompt: str, context: Optional[str], conversation_history: Optional[List[Message]] = None) -> str:
+        raise NotImplementedError
 
-def ollama_prompt(prompt: str, content: str) -> str:
-    try:
-        messages = [
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ]
+class OllamaClient(LLMClient):
+    """Client for interacting with Ollama API."""
 
-        if content:
-            messages.append({"role": "user", "content": content})
+    def generate_response(self, prompt: str, context: Optional[str], conversation_history: Optional[List[Message]] = None) -> str:
+        try:
+            messages = conversation_history.copy() if conversation_history else []
 
-        res = ollama.chat(
-            model="llava",
+            if context:
+                messages.append({"role": "user", "content": context})
+            messages.append({"role": "user", "content": prompt})
+
+            response = ollama.chat(model="llava", messages=messages)
+            return response["message"]["content"]
+
+        except Exception:
+            sys.exit(
+                "Could not connect to Ollama API. Is it running?\n"
+                "> ollama run llama3.2"
+            )
+
+class OpenAIClient(LLMClient):
+    """Client for interacting with OpenAI API."""
+
+    def __init__(self):
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    def generate_response(self, prompt: str, context: Optional[str], conversation_history: Optional[List[Message]] = None) -> str:
+        messages = conversation_history.copy() if conversation_history else []
+
+        if context:
+            messages.append({"role": "user", "content": context})
+        messages.append({"role": "user", "content": prompt})
+
+        result = self.client.chat.completions.create(
+            model="gpt-4",
             messages=messages
         )
+        return result.choices[0].message.content
 
-        response = res["message"]["content"]
+def check_internet_connection() -> None:
+    """Check if there's an active internet connection."""
+    try:
+        socket.create_connection(("8.8.8.8", 53), timeout=5)
+    except OSError:
+        sys.exit("No internet connection.")
 
-        return response
-    except Exception as e:
-        print()
-        print("Could not connect to Ollama API. Is it running?")
-        print()
-        print("> ollama run llama3.2 ")
+def process_output(output: str, output_file: Optional[Path], config: Config) -> None:
+    """Process and display or save the output."""
+    if output_file:
+        output_file.write_text(output)
+        print(f"Output written to file {output_file}")
+    else:
+        separator = '- ' * 40
+        print(f"\n{separator}\n\n{output}\n\n{separator}\n")
 
+        if config.keep_alive:
+            remaining_messages = config.max_history - len(config.conversation_history) // 2
+            if config.debug:
+                print(f"Remaining messages in conversation: {remaining_messages}")
 
-def openai_prompt(prompt: str, content: str) -> str:
-    messages = [
-        {
-            "role": "user",
-            "content": prompt,
-        }
-    ]
+def get_prompt_for_task(config: Config) -> str:
+    """Get the appropriate prompt template based on the task."""
+    templates = PromptTemplates()
 
-    if content:
-        messages.append({"role": "user", "content": content})
+    task_prompts = {
+        "translate": templates.translate(config.output_lang),
+        "grammar": templates.GRAMMAR,
+        "syntax": templates.SYNTAX,
+        "adsyntax": templates.AD_SYNTAX,
+        "explain": templates.EXPLAIN,
+        "summarize": templates.SUMMARIZE if config.file else "",
+        "tone": templates.tone(config.tone)
+    }
 
-    result = OpenAIClient.chat.completions.create(
-        model="gpt-4o",
-        messages=messages
+    return f"{task_prompts.get(config.task, '')}{config.prompt}"
+
+def parse_arguments() -> Config:
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description="Language Model CLI Tool")
+
+    parser.add_argument("file_or_prompt", nargs='?', help="File path for summarize task or prompt for other tasks")
+    parser.add_argument("-c", "--context", help="Additional context")
+    parser.add_argument("-f", "--file", type=Path, help="Input file path")
+    parser.add_argument("-l", "--lib", default="openai", help="Library to use (openai/ollama)")
+    parser.add_argument("-o", "--output", type=Path, help="Output file path")
+    parser.add_argument(
+        "-t",
+        "--task",
+        choices=["translate", "grammar", "syntax", "adsyntax", "explain", "summarize", "chat", "tone"],
+        default="chat",
+        help="Task to perform"
+    )
+    parser.add_argument("-ol", "--output-lang", default="en", help="Output language")
+    parser.add_argument("-d", "--debug", action="store_true", help="Debug mode")
+    parser.add_argument("--keep", action="store_true", help="Enable interactive chat mode with conversation history")
+    parser.add_argument("--max-history", type=int, default=100, help="Maximum number of messages in chat history")
+    parser.add_argument(
+        "--tone",
+        help="Specify the tone for text rewriting (e.g., formal, casual, professional)",
+        default="casual"
     )
 
-    return result.choices[0].message.content
+    args = parser.parse_args()
 
+    # Handle file argument based on task
+    file_path = None
+    prompt = args.file_or_prompt if args.file_or_prompt else ""
 
-parser = argparse.ArgumentParser()
-
-
-parser.add_argument("prompt", help="Prompt", nargs='?',
-                    default="default prompt")
-parser.add_argument("-p", "--prompt", help="Prompt")
-parser.add_argument("-c", "--context", help="Context", default=None)
-parser.add_argument("-f", "--file", help="File")
-parser.add_argument("-l", "--lib", help="Library to use", default="openai")
-parser.add_argument("-o", "--output", help="Output file", default=None)
-parser.add_argument("-t", "--task", help="Task to perform", default="chat")
-parser.add_argument("-ol", "--output-lang", help="Output language", default="en")
-
-args = parser.parse_args()
-
-def process_output(output: str, dest: str):
-    if dest != "print":
-        with open(args.output, "w") as file:
-            file.write(output)
-            print(f"Output written to file {args.output}")
+    if args.task == "summarize":
+        # For summarize task, treat positional argument as file
+        if args.file_or_prompt:
+            file_path = Path(args.file_or_prompt)
+        elif args.file:
+            file_path = args.file
     else:
-        print()
-        print('- ' * 40)
-        print()
-        print(output)
-        print()
-        print('- ' * 40)
-        print()
+        # For other tasks, treat positional argument as prompt
+        file_path = args.file
 
-def get_file_content(file: str) -> str:
-    with open(file, "r") as file:
-        return file.read()
+    return Config(
+        prompt=prompt,
+        context=args.context,
+        file=file_path,
+        library=args.lib,
+        output_file=args.output,
+        task=args.task,
+        output_lang=args.output_lang,
+        debug=args.debug,
+        keep_alive=args.keep,
+        max_history=args.max_history,
+        tone=args.tone
+    )
 
-context = None
-task = args.task
-prompt = args.prompt
-output_lang = args.output_lang
+def update_conversation_history(config: Config, prompt: str, response: str) -> None:
+    """Update the conversation history while maintaining the message limit."""
+    if not config.keep_alive:
+        return
 
-if task == "translate":
-    prompt = f"{get_translation_prompt(output_lang)}{prompt}"
+    # Add the new message pair to the history
+    config.conversation_history.append({"role": "user", "content": prompt})
+    config.conversation_history.append({"role": "assistant", "content": response})
 
-if task == "grammar":
-    prompt = f"{GRAMMAR_PROMPT}{prompt}"
+    # Trim history if it exceeds the maximum length
+    while len(config.conversation_history) > config.max_history * 2:  # *2 because each exchange has 2 messages
+        config.conversation_history.pop(0)  # Remove oldest message
 
-if task == "syntax":
-    prompt = f"{SYNTAX_PROMPT}{prompt}"
+def interactive_chat(config: Config, client: LLMClient) -> None:
+    """Handle interactive chat mode."""
+    print("\nInteractive chat mode enabled. Type 'exit' or 'quit' to end the session.")
+    if config.debug:
+        print(f"Message history limit: {config.max_history}")
+    first_cycle = True
 
-if task == "adsyntax":
-    prompt = f"{AD_SYNTAX_PROMPT}{prompt}"
+    while True:
+        try:
+            if first_cycle and config.prompt:
+                user_input = config.prompt
+                first_cycle = False
+            else:
+                user_input = input("\n> ")
 
-if args.file:
-    context = get_file_content(args.file)
+            if user_input.lower() in ['exit', 'quit']:
+                break
 
-if args.context:
-    context = args.context
+            if not user_input.strip():
+                continue
 
-result = None
+            config.prompt = user_input
+            prompt = get_prompt_for_task(config)
 
-if args.lib == "o" or args.lib == "ollama":
-    result = ollama_prompt(prompt, context)
-else:
-    result = openai_prompt(prompt, context)
+            # Generate and process response
+            result = client.generate_response(prompt, config.context, config.conversation_history)
+            update_conversation_history(config, prompt, result)
+            process_output(result, config.output_file, config)
 
-if args.output:
-    process_output(result, args.output)
-else:
-    process_output(result, "print")
+        except KeyboardInterrupt:
+            print("\nChat session ended.")
+            break
+        except EOFError:
+            print("\nChat session ended.")
+            break
+
+def main() -> None:
+    """Main execution function."""
+    # Load environment variables and check prerequisites
+    load_dotenv()
+    if not os.getenv("OPENAI_API_KEY"):
+        sys.exit("OPENAI_API_KEY is not set")
+    check_internet_connection()
+
+    # Parse arguments and prepare configuration
+    config = parse_arguments()
+
+    # Get file content if specified
+    if config.file:
+        config.context = config.file.read_text()
+
+    # Select appropriate client
+    client = OllamaClient() if config.library in {"o", "ollama"} else OpenAIClient()
+
+    # Log debug information
+    if config.debug:
+        print(f"Task: {config.task} | Context: {config.context} | Prompt: {config.prompt} | "
+              f"File: {config.file} | Keep Alive: {config.keep_alive} | Tone: {config.tone}")
+
+    if config.keep_alive:
+        # Run in interactive mode
+        interactive_chat(config, client)
+    else:
+        # Run in single-response mode
+        prompt = get_prompt_for_task(config)
+        result = client.generate_response(prompt, config.context)
+        process_output(result, config.output_file, config)
+
+if __name__ == "__main__":
+    main()

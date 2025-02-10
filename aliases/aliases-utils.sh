@@ -1,4 +1,17 @@
-alias chrome='open -a "Google Chrome"'
+_open_chrome() {
+    # Check if input is a valid file path
+    if [[ -f "$1" ]]; then
+        open -a "Google Chrome" "$1"
+    # Check if input has http:// or https://
+    elif [[ "$1" =~ ^https?:// ]]; then
+        open -a "Google Chrome" "$1"
+    # Otherwise, treat as domain and add https://
+    else
+        open -a "Google Chrome" "https://$1"
+    fi
+}
+
+alias chrome='_open_chrome'
 alias cat_scripts='cat package.json | jq ".scripts"'
 alias cat-scripts="cat_scripts"
 alias random-pass='~/scripts/src/python/random-pass.py'
@@ -30,14 +43,19 @@ alias update_s='update_source'
 alias video-to-gif='~/scripts/src/sh/video-to-gif.sh'
 alias to-gif="video-to-gif"
 alias togif="video-to-gif"
-alias vs='code .'
-alias c.='code .'
-alias code.="code ."
 
-alias editscripts='code ~/scripts/'
-alias edit-scripts='editscripts'
-alias scripts-edit='editscripts'
-alias scriptsedit='editscripts'
+
+alias vscode="open -a 'Visual Studio Code'"
+alias code="cursor"
+
+alias vs="vscode ."
+alias c.="vscode ."
+alias code.="vscode ."
+
+alias editscripts="code ~/scripts/"
+alias edit-scripts="editscripts"
+alias scripts-edit="editscripts"
+alias scriptsedit="editscripts"
 
 alias interval="node ~/scripts/src/js/interval.js"
 
@@ -78,7 +96,7 @@ alias to-mp4="ffmpeg -i $1 -codec copy $2"
 alias to-mp3="ffmpeg -i $1 -vn -acodec libmp3lame -q:a 4 $2"
 alias tomp3="to-mp3"
 
-alias conceitual="cd /Users/<your-path>/projects/conceitual; clas"
+alias conceitual="cd /Users/<your-path>/projects/conceptual; clas"
 
 alias yanr="yarn"
 
@@ -87,10 +105,6 @@ alias github="chrome 'https://github.com/<your-path>?tab=repositories'"
 alias emerson="cd ~/projects/personal/<your-path>.github.io"
 alias emers="emerson"
 alias emer="emerson"
-
-alias calendar="chrome https://calendar.google.com/calendar/u/1/r"
-alias cale="calendar"
-alias cald="calendar"
 
 alias sizeof="~/scripts/src/sh/file.sh"
 alias new="~/scripts/new-terminal.sh"
@@ -107,3 +121,5 @@ alias http-status="http-code"
 alias salaries="go run ~/scripts/src/go/salaries.go"
 
 alias camera="chrome 'https://emerson.run/#/labs/camera'"
+
+alias add_alias="python3 ~/scripts/src/python/create-alias.py"

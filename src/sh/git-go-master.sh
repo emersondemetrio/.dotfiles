@@ -9,4 +9,3 @@ fi
 
 git pull
 git status
-yarn

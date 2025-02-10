@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/opt/homebrew/bin/node
 
 /**
  * Calculate the difference in days, months, and weeks between two dates.

@@ -1,11 +1,11 @@
-// Place your key bindings in this file to override the defaultsauto[]
+// Place your key bindings in this file to override the defaults
 [
 	{
-		"key": "ctrl+k ctrl+u",
+		"key": "cmd+k cmd+u",
 		"command": "editor.action.transformToUppercase"
 	},
 	{
-		"key": "ctrl+k ctrl+l",
+		"key": "cmd+k cmd+l",
 		"command": "editor.action.transformToLowercase"
 	}
 ]

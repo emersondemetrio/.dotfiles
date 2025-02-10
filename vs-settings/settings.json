@@ -18,7 +18,6 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"prettier.tabWidth": 4,
-	"editor.formatOnSave": true,
 	"explorer.confirmDelete": false,
 	"editor.minimap.enabled": false,
 	"[json]": {
@@ -49,7 +48,8 @@
 	"javascript.updateImportsOnFileMove.enabled": "always",
 	"editor.inlayHints.enabled": false,
 	"terminal.integrated.env.osx": {
-		"FIG_NEW_SESSION": "1"
+		"FIG_NEW_SESSION": "1",
+		"Q_NEW_SESSION": "1"
 	},
 	"explorer.confirmDragAndDrop": false,
 	"[css]": {
@@ -83,7 +83,7 @@
 			// "source.fixAll": "explicit",
 			// "source.organizeImports": "explicit"
 		},
-		"editor.defaultFormatter": "charliermarsh.ruff"
+		"editor.defaultFormatter": "ms-python.autopep8"
 	},
 	"window.zoomLevel": 1,
 	"workbench.editor.enablePreview": false,
@@ -95,5 +95,22 @@
 	"editor.stickyTabStops": true,
 	"editor.stickyScroll.enabled": true,
 	"editor.rulers": [80],
-	"github.copilot.editor.enableAutoCompletions": true
+	"github.copilot.editor.enableAutoCompletions": true,
+	"makefile.configureOnOpen": true,
+	"explorer.fileNesting.patterns": {
+		"*.ts": "${capture}.js",
+		"*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+		"*.jsx": "${capture}.js",
+		"*.tsx": "${capture}.ts",
+		"tsconfig.json": "tsconfig.*.json",
+		"package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb",
+		"pubspec.yaml": "pubspec.lock,pubspec_overrides.yaml,.packages,.flutter-plugins,.flutter-plugins-dependencies,.metadata",
+		"*.dart": "${capture}.g.dart",
+		"*.sqlite": "${capture}.${extname}-*",
+		"*.db": "${capture}.${extname}-*",
+		"*.sqlite3": "${capture}.${extname}-*",
+		"*.db3": "${capture}.${extname}-*",
+		"*.sdb": "${capture}.${extname}-*",
+		"*.s3db": "${capture}.${extname}-*"
+	}
 }

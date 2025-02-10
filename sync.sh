@@ -4,11 +4,7 @@ echo "Syncing aliases..."
 
 cp -R ~/scripts/aliases/ aliases
 
-rm aliases/aliases-kyte.sh
-rm aliases/aliases-ops-tooling.sh
-rm aliases/aliases-surfer.sh
-rm aliases/aliases-flaggr.sh
-rm aliases/aliases-fleet.sh
+rm aliases/aliases-ae.sh
 
 ls -l aliases
 
