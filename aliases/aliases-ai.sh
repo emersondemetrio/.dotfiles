@@ -19,3 +19,5 @@ alias long="prompt --keep"
 alias tone="prompt -t tone --tone"
 HARVEST_PROMPT="I will list tasks I completed during my day, and when I say 'I am done,' or iad, you should format them into a markdown list. Please fix any grammar mistakes and add a specific task ID (e.g., [TIME-XXXX]) before each line if I mention one. Once formatted, keep the list concise and well-structured."
 alias harvest="prompt --keep \"$HARVEST_PROMPT\""
+
+alias clip-prompt="clippaste | prompt --debug --task prompt"

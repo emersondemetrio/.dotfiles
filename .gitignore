@@ -4,6 +4,8 @@ aliases/aliases-surfer.sh
 aliases/aliases-flaggr.sh
 aliases/aliases-fleet.sh
 
+aliases/chrome.json
+
 src/verify-user.sh
 src/new-react-component
 src/open-fleet*

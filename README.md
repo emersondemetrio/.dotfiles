@@ -17,53 +17,55 @@ A collection of productivity tools and aliases for macOS development workflow.
 ## Features
 
 ### Git Workflow
+- Comprehensive git aliases and utilities
 - Branch management and status checks
 - Automated commit and push commands
 - Diff utilities and branch cleanup
-
-### AI Tools
-- OpenAI/Claude integration
-- Translation and grammar checking
-- Code syntax assistance
-- Task logging with JIRA integration
+- Custom git configurations
 
 ### Development Tools
-- Node/iOS/Android utilities
+- Multi-language support (TypeScript, JavaScript, Python, Go)
+- React Native development utilities
+- Android development tools
+- Docker management commands
+- Backend development helpers
 - String manipulation tools
-- Media conversion scripts
+- Python linting and utilities
 - VSCode configurations
+
+### AI and Productivity
+- OpenAI/Claude integration
+- AI-assisted development tools
+- Project-specific shortcuts
+- Folder navigation helpers
+- Apple-specific utilities
 
 ## Installation
 
 1. Clone this repository
 2. Install required software
-3. Run:
+3. Copy files to your home.
 
-```
-./sync.sh
-```
-
-The sync script will:
-- Copy aliases from ~/scripts/aliases/
-- Sync source files from ~/scripts/src/
-- Back up VSCode settings and extensions
-- Remove sensitive files (listed in .gitignore)
-- Sanitize personal paths in configurations
 
 ## Directory Structure
 
 ```
 .
-├── aliases/          # Shell aliases
-├── src/             # Source files
-├── vs-settings/     # VSCode configurations
-└── sync.sh          # Main sync script
+├── aliases/                  # Shell aliases
+│   ├── aliases-android.sh    # Android development aliases
+│   ├── aliases-docker.sh     # Docker management
+│   ├── aliases-git.sh        # Git workflow
+│   ├── aliases-ai.sh        # AI tools integration
+│   ├── aliases-python.sh    # Python development
+│   ├── aliases-utils.sh     # General utilities
+│   └── ... (other aliases)
+├── src/                     # Source files
+│   ├── typescript/         # TypeScript utilities
+│   ├── js/                # JavaScript utilities
+│   ├── python/            # Python scripts
+│   ├── sh/                # Shell scripts
+│   └── go/                # Go utilities
+├── vs-settings/            # VSCode configurations
+├── android-release-suite/  # Android release tools
+└── sync.sh                # Main sync script
 ```
-
-## Contributing
-
-Feel free to fork and customize. Pull requests welcome!
-
-## License
-
-MIT

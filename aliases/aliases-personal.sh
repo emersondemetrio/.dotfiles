@@ -1,6 +1,40 @@
-alias trello="chrome https://trello.com/b/tSBjLOPk/day-to-day"
-alias flights="chrome 'https://www.google.com/travel/flights?hl=en&gl=us&authuser=0'"
-alias cl="chrome 'https://calendar.google.com/calendar?authUser=emer.demetrio@gmail.com'"
+# Chrome shortcuts
+create_chrome_shortcuts() {
+  local shortcuts_file="$HOME/scripts/aliases/chrome.json"
+
+  if [ -f "$shortcuts_file" ]; then
+    while IFS= read -r shortcut; do
+      # Get the URL and aliases
+      local url=$(echo "$shortcut" | jq -r '.url')
+      local aliases=$(echo "$shortcut" | jq -r '.alias[]')
+      local name=$(echo "$shortcut" | jq -r '.name')
+
+      # Create aliases for each alias in the array
+      echo "$aliases" | while read -r alias_name; do
+        # Skip empty lines
+        [ -z "$alias_name" ] && continue
+
+        # Create the alias
+        alias "$alias_name"="chrome '$url'"
+
+        # Debug output if needed
+        # echo "Created alias: $alias_name -> $name ($url)"
+      done
+    done < <(jq -c '.[]' "$shortcuts_file")
+  else
+    echo "Chrome shortcuts file not found: $shortcuts_file"
+    printf "Example file: \n [
+      {
+        "url": "https://www.google.com",
+        "alias": ["g", "google"],
+        "name": "Google"
+      }
+    ]\n"
+  fi
+}
+
+# Create the chrome shortcuts
+create_chrome_shortcuts
 
 youtubes() {
     # https://www.youtube.com/results?search_query=sinkin+summer
@@ -13,7 +47,9 @@ ayoutubes() {
 }
 
 alias youtube="chrome 'https://www.youtube.com/'"
-alias youtubes="youtubes"
-alias layoutubes="ayoutubes"
+# alias youtubes="youtubes"
+alias iyoutubes="ayoutubes"
 
-alias pl="chrome https://open.spotify.com/collection/tracks"
+alias shoe="youtubes shoegaze playlist"
+
+

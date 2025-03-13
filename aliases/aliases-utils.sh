@@ -1,3 +1,8 @@
+alias list-services-by-port="lsof -i -P -n | grep LISTEN | grep :$PORT"
+alias lsbp="list-services-by-port"
+alias lsp="list-services-by-port"
+
+
 _open_chrome() {
     # Check if input is a valid file path
     if [[ -f "$1" ]]; then
@@ -96,7 +101,9 @@ alias to-mp4="ffmpeg -i $1 -codec copy $2"
 alias to-mp3="ffmpeg -i $1 -vn -acodec libmp3lame -q:a 4 $2"
 alias tomp3="to-mp3"
 
-alias conceitual="cd /Users/<your-path>/projects/conceptual; clas"
+alias conceitual="cd /Users/<your-path>/projects/conceptual; clas;"
+alias conceptual="conceitual"
+alias pocs="conceptual"
 
 alias yanr="yarn"
 
@@ -123,3 +130,54 @@ alias salaries="go run ~/scripts/src/go/salaries.go"
 alias camera="chrome 'https://emerson.run/#/labs/camera'"
 
 alias add_alias="python3 ~/scripts/src/python/create-alias.py"
+alias addalias="add_alias"
+alias add-alias="add_alias"
+
+alias pasteable="chrome https://emerson.run/#/paste"
+
+clip2img() {
+    # hide the output
+    local output_file="${1:-screenshot_$(date +%Y%m%d_%H%M%S).png}"
+    osascript -l JavaScript <<EOF > /dev/null 2>&1
+        ObjC.import('AppKit')
+        function run() {
+            const pasteboard = $.NSPasteboard.generalPasteboard;
+
+            try {
+                const imgData = pasteboard.dataForType('public.png');
+                if (imgData) {
+                    imgData.writeToFileAtomically("$output_file", true);
+                    return true;
+                }
+            } catch (error) {
+                return false;
+            }
+        }
+EOF
+
+
+    # check if the file was created
+    if [ -f "$output_file" ]; then
+        echo "Screenshot saved as: $output_file"
+    else
+        echo "No image found in clipboard"
+        return 1
+    fi
+}
+
+alias screenshot-to-file="clip2img"
+alias sc-to-file="clip2img"
+
+to_png() {
+    ffmpeg -i $1 $2.png
+}
+
+alias to-png="to_png"
+alias topng="to_png"
+
+alias back="cd .."
+alias back2="cd ../.."
+alias back3="cd ../../.."
+
+alias cd2="cd ../.."
+alias cd3="cd ../../.."
