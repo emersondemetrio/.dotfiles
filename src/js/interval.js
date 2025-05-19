@@ -53,8 +53,18 @@ if (!process.argv[2] || !process.argv[3]) {
 	process.exit(-1);
 }
 
+const endDateParam = process.argv[3];
+
+const canBeNow = ['now', 'today', 'agora', 'hoje'];
+let endDate;
+if (canBeNow.includes(endDateParam)) {
+	endDate = new Date();
+} else {
+	endDate = new Date(endDateParam);
+}
+
 const startDate = new Date(process.argv[2]);
-const endDate = new Date(process.argv[3]);
+
 const includeDates = process.argv[4] === 'true';
 const difference = dateDifference(startDate, endDate, includeDates);
 

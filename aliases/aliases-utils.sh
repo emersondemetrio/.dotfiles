@@ -2,7 +2,6 @@ alias list-services-by-port="lsof -i -P -n | grep LISTEN | grep :$PORT"
 alias lsbp="list-services-by-port"
 alias lsp="list-services-by-port"
 
-
 _open_chrome() {
     # Check if input is a valid file path
     if [[ -f "$1" ]]; then
@@ -17,6 +16,7 @@ _open_chrome() {
 }
 
 alias chrome='_open_chrome'
+alias chr='chrome'
 alias cat_scripts='cat package.json | jq ".scripts"'
 alias cat-scripts="cat_scripts"
 alias random-pass='~/scripts/src/python/random-pass.py'
@@ -49,9 +49,11 @@ alias video-to-gif='~/scripts/src/sh/video-to-gif.sh'
 alias to-gif="video-to-gif"
 alias togif="video-to-gif"
 
-
 alias vscode="open -a 'Visual Studio Code'"
 alias code="cursor"
+alias cdo="cursor"
+alias cde="cursor"
+alias coe="cursor"
 
 alias vs="vscode ."
 alias c.="vscode ."
@@ -138,7 +140,7 @@ alias pasteable="chrome https://emerson.run/#/paste"
 clip2img() {
     # hide the output
     local output_file="${1:-screenshot_$(date +%Y%m%d_%H%M%S).png}"
-    osascript -l JavaScript <<EOF > /dev/null 2>&1
+    osascript -l JavaScript <<EOF >/dev/null 2>&1
         ObjC.import('AppKit')
         function run() {
             const pasteboard = $.NSPasteboard.generalPasteboard;
@@ -154,7 +156,6 @@ clip2img() {
             }
         }
 EOF
-
 
     # check if the file was created
     if [ -f "$output_file" ]; then
@@ -181,3 +182,24 @@ alias back3="cd ../../.."
 
 alias cd2="cd ../.."
 alias cd3="cd ../../.."
+
+# Function to list and search aliases
+__list_aliases() {
+    echo "\nAvailable Aliases:\n"
+    if [ -n "$1" ]; then
+        alias | grep -i "$1" | awk -F"=" '{printf "\033[33m%-20s\033[0m → %s\n", $1, $2}' | sort
+    else
+        alias | awk -F"=" '{printf "\033[33m%-20s\033[0m → %s\n", $1, $2}' | sort
+    fi
+    echo "\nTotal matches: $(alias | grep -c "${1:-.}")\n"
+}
+
+# Keep your existing shortcuts
+alias get-aliases="__list_aliases"
+alias list-aliases="__list_aliases"
+alias lal="list-aliases"
+alias gal="list-aliases"
+
+alias calc="node -e 'console.log(eval(process.argv[1]))'"
+
+alias km="exit"

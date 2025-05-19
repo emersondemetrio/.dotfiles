@@ -1,4 +1,4 @@
-alias claude="chrome 'https://claude.ai/'"
+alias claude="chrome 'https://claude.ai/new'"
 
 alias prompt="~/scripts/src/python/ai.py"
 alias ollama_prompt="~/scripts/src/python/ai.py -l 'ollama'"
@@ -21,3 +21,5 @@ HARVEST_PROMPT="I will list tasks I completed during my day, and when I say 'I a
 alias harvest="prompt --keep \"$HARVEST_PROMPT\""
 
 alias clip-prompt="clippaste | prompt --debug --task prompt"
+
+alias localhost="chrome 'http://localhost:5173'"

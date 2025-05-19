@@ -26,7 +26,7 @@ fi
 if [ -n "$RESOLUTION" ]; then
     echo "Custom resolution: $RESOLUTION"
 else
-    RESOLUTION=700
+    RESOLUTION=120
     echo "Default resolution: $RESOLUTION"
 fi
 

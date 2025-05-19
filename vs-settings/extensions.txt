@@ -1,6 +1,5 @@
 albert.tabout
 amazonwebservices.codewhisperer-for-command-line-companion
-augment.vscode-augment
 aykutsarac.jsoncrack-vscode
 bobmagicii.autofoldyeah
 dart-code.dart-code

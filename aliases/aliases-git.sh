@@ -20,6 +20,10 @@ alias stashgomas="clear; git stash; git checkout master; git pull; git status; y
 alias stash-gomas="stashgomas"
 alias sgomas="stashgomas"
 
+alias godev="gobranch development"
+alias fgodev="clear; echo ''; godev; resetorigin"
+alias fgobranch="clear; echo ''; gobranch $1; resetorigin"
+
 alias rebase_master='~/scripts/src/sh/git-rebase-master.sh'
 alias rebase-master='rebase_master'
 alias rebasemaster='rebase_master'
@@ -77,6 +81,10 @@ alias gobranch="git checkout $1"
 alias copy-diff="~/scripts/src/sh/copy-diff.sh"
 alias copydiff="copy-diff"
 
+alias copy-diff-dev="git diff origin/development | pbcopy"
+alias dev-copy-diff="copy-diff-dev"
+alias devcopydiff="copy-diff-dev"
+
 ## end Copy diff to clipboard
 
 alias rebase="git rebase -i $1"
@@ -133,4 +141,6 @@ url_from_branch() {
 alias open-remote='open -a "Google Chrome" "$(url_from_branch)"'
 alias open-issues='open -a "Google Chrome" "$(url_from_branch)/issues"'
 alias open-mrs='open -a "Google Chrome" "$(url_from_branch)/pulls"'
-alias merges='open -a "Google Chrome" "$(url_from_branch)/pulls"'
+alias merges='open -a "Google Chrome" "$(url_from_branch)/pulls/$USER"'
+
+alias no_edit_amend_and_push="echo 'Assuming you have added files already.'; git commit --amend --no-edit --no-verify; git push -f"

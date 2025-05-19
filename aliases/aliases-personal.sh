@@ -36,6 +36,8 @@ create_chrome_shortcuts() {
 # Create the chrome shortcuts
 create_chrome_shortcuts
 
+alias pbchrome="chrome $(pbpaste)"
+
 youtubes() {
     # https://www.youtube.com/results?search_query=sinkin+summer
     open -a "Google Chrome" "https://www.youtube.com/results?search_query=$*"
